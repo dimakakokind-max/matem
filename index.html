@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CICADA ULTIMATE — Гугология</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: #0a0a0a;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ===== ШАПКА ===== */
+header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    border-bottom: 1px solid #00ff4133;
+}
+
+.logo {
+    font-size: 60px;
+    animation: pulse 2s infinite;
+}
+
+h1 {
+    font-size: 36px;
+    letter-spacing: 8px;
+    text-shadow: 0 0 20px #00ff41;
+    margin: 15px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    opacity: 0.6;
+    letter-spacing: 3px;
+}
+
+/* ===== МЕНЮ УРОВНЕЙ ===== */
+.levels {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.level-card {
+    background: #111;
+    border: 1px solid #00ff4133;
+    border-radius: 6px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.level-card:hover {
+    border-color: #00ff41;
+    box-shadow: 0 0 30px #00ff4133;
+    transform: translateY(-5px);
+}
+
+.level-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: #00ff41;
+}
+
+.level-card.easy::before { background: #00ff41; }
+.level-card.medium::before { background: #ffaa00; }
+.level-card.hard::before { background: #ff0041; }
+.level-card.extreme::before { background: #aa00ff; }
+.level-card.cicada::before { background: linear-gradient(#00ff41, #ff0041, #aa00ff); }
+
+.level-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.level-card .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+.badge.easy { background: #00ff4122; color: #00ff41; border: 1px solid #00ff4155; }
+.badge.medium { background: #ffaa0022; color: #ffaa00; border: 1px solid #ffaa0055; }
+.badge.hard { background: #ff004122; color: #ff0041; border: 1px solid #ff004155; }
+.badge.extreme { background: #aa00ff22; color: #aa00ff; border: 1px solid #aa00ff55; }
+.badge.cicada { background: #00ff4111; color: #00ff41; border: 1px solid #00ff4155; }
+
+.level-card .formula-preview {
+    font-size: 14px;
+    opacity: 0.7;
+    margin: 15px 0;
+    word-break: break-all;
+    line-height: 1.6;
+}
+
+.level-card .desc {
+    font-size: 12px;
+    opacity: 0.5;
+    line-height: 1.6;
+}
+
+/* ===== МОДАЛЬНОЕ ОКНО ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000000dd;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 40px 20px;
+}
+
+.modal.active { display: block; animation: fadeIn 0.3s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #0f0f0f;
+    border: 1px solid #00ff41;
+    border-radius: 8px;
+    padding: 40px;
+    position: relative;
+    animation: slideUp 0.4s;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 28px;
+    color: #00ff41;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+}
+
+.close-btn:hover { color: #ff0041; }
+
+.modal h2 {
+    font-size: 24px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15px #00ff41;
+}
+
+.modal .modal-formula {
+    background: #111;
+    border-left: 3px solid #00ff41;
+    padding: 20px;
+    margin: 25px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    word-break: break-all;
+    overflow-x: auto;
+}
+
+.modal h3 {
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: #ffaa00;
+    margin: 30px 0 15px;
+}
+
+.modal p {
+    font-size: 14px;
+    line-height: 1.8;
+    opacity: 0.85;
+    margin: 10px 0;
+}
+
+.modal ul {
+    margin: 15px 0 15px 25px;
+    font-size: 14px;
+    line-height: 2;
+    opacity: 0.85;
+}
+
+.modal li::marker { color: #00ff41; }
+
+.answer-box {
+    background: #00ff4108;
+    border: 1px solid #00ff4155;
+    padding: 20px;
+    margin: 25px 0;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+}
+
+/* ===== ФУТЕР ===== */
+footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 11px;
+    opacity: 0.4;
+    letter-spacing: 3px;
+    border-top: 1px solid #00ff4133;
+}
+
+/* ===== МОБИЛЬНАЯ ===== */
+@media (max-width: 600px) {
+    h1 { font-size: 22px; letter-spacing: 4px; }
+    .logo { font-size: 40px; }
+    .levels { grid-template-columns: 1fr; }
+    .modal-content { padding: 25px; }
+    .modal h2 { font-size: 18px; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">🦗</div>
+    <h1>CICADA ULTIMATE</h1>
+    <p class="subtitle">ГУГОЛОГИЯ · УРОВНИ · РЕШЕНИЯ</p>
+</header>
+
+<section class="levels" id="levels">
+    <!-- Карточки генерируются через JS -->
+</section>
+
+<footer>
+    CICADA ULTIMATE © 2026 · THE ANSWER IS NOT 0.12
+</footer>
+
+<!-- ===== МОДАЛЬНОЕ ОКНО ===== -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">×</button>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script>
+// ==================== ДАННЫЕ ====================
+
+const LEVELS = [
+    {
+        id: 1,
+        name: 'ЧИСЛО ГРЭМА',
+        badge: 'easy',
+        badgeText: 'ЛЁГКИЙ',
+        preview: 'g₆₄ = 3 ↑↑↑↑ 3 ... (64 уровня)',
+        desc: 'Классика. Первое большое число, которое узнают все.',
+        formula: 'g₁ = 3 ↑↑↑↑ 3\\ngₙ₊₁ = 3 ↑^(gₙ) 3\\ng₆₄ = ?',
+        solution: 'Число Грэма — это g₆₄. Оно использует 64 уровня стрелок Кнута. Каждый уровень чудовищно больше предыдущего. Несмотря на размер, оно вычислимо и конечно.',
+        answer: 'g₆₄ — число Грэма. Больше, чем всё, что можно вообразить, но меньше TREE(3).'
+    },
+    {
+        id: 2,
+        name: 'TREE(3)',
+        badge: 'medium',
+        badgeText: 'СРЕДНИЙ',
+        preview: 'TREE(3) > g₆₄',
+        desc: 'Число из теоремы Краскала. Больше числа Грэма.',
+        formula: 'TREE(3) = max{ n : существует последовательность из n деревьев с 3 цветами }',
+        solution: 'TREE(3) — максимальная длина последовательности деревьев с 3 цветами, удовлетворяющая теореме Краскала. Доказано, что TREE(3) > g₆₄. Это уже невообразимо.',
+        answer: 'TREE(3) больше числа Грэма. И это доказано.'
+    },
+    {
+        id: 3,
+        name: 'ФУНКЦИЯ ЗАНЯТОГО БОБРА',
+        badge: 'hard',
+        badgeText: 'СЛОЖНЫЙ',
+        preview: 'BB(n) — невычислима',
+        desc: 'Самая мощная вычислимая функция. Но её нельзя вычислить.',
+        formula: 'BB(n) = max{ k : ∃ машина Тьюринга с n состояниями, останавливается за k шагов }',
+        solution: 'Функция занятого бобра (Busy Beaver) растёт быстрее любой вычислимой функции. BB(10⁶) больше TREE(3). При этом BB(n) невычислима — её нельзя посчитать ни на каком компьютере.',
+        answer: 'BB(n) невычислима. BB(10⁶) >> TREE(3).'
+    },
+    {
+        id: 4,
+        name: 'ФУНКЦИЯ RAYO',
+        badge: 'hard',
+        badgeText: 'СЛОЖНЫЙ',
+        preview: 'Rayo(n) — больше BB',
+        desc: 'Число, которое нельзя выразить меньше чем n символами.',
+        formula: 'Rayo(n) = max{ k : k выразимо менее чем n символами в теории множеств }',
+        solution: 'Rayo(n) растёт быстрее BB(n). Rayo(10¹⁰⁰) больше всего, что можно определить в теории множеств. Это уже за пределами ZFC.',
+        answer: 'Rayo(10¹⁰⁰) >> BB(10⁶).'
+    },
+    {
+        id: 5,
+        name: 'ГИПОТЕЗА РИМАНА',
+        badge: 'extreme',
+        badgeText: 'ЭКСТРИМ',
+        preview: 'ζ(s) = 0 ⇒ Re(s) = 1/2',
+        desc: 'Не решена с 1859 года. Приз — $1 000 000.',
+        formula: 'ζ(s) = Σ 1/nˢ = Π (1 - p⁻ˢ)⁻¹\\nζ(s) = 0 ⇒ Re(s) = 1/2',
+        solution: 'Гипотеза Римана утверждает, что все нетривиальные нули дзета-функции лежат на критической прямой Re(s) = 1/2. Не решена 160+ лет. Связана с распределением простых чисел.',
+        answer: 'Гипотеза Римана не решена. Ответ неизвестен.'
+    },
+    {
+        id: 6,
+        name: 'TTGS-Ω',
+        badge: 'cicada',
+        badgeText: 'ЦИКАДА',
+        preview: '𝔗_Ω = [Ξ · Λ · Ψ · Θ · Φ · Σ]^⇑^Ω',
+        desc: 'Наша формула. Соединяет всё: физику, геометрию, математику, Римана.',
+        formula: '𝔗_Ω = [ Ξ_Мат · Λ_Физ · Ψ_Транс · Θ_Орд · Φ_Гео · Σ_Рим ]^(⇑^(Ω^Ω^Ω^Ω^Ω))',
+        solution: 'TTGS-Ω — авторская нотация. Она соединяет: число Грэма, TREE(3), SSCG(3), BB, Rayo, Loader, ординалы (ε₀, Γ₀, Ω), кардиналы (ℵ, ℶ), 14480-мерную геометрию, уравнения Эйнштейна, гипотезу Римана и 10 двигателей. Это не задача — это нотация. Её не решают, её используют.',
+        answer: '𝔗_Ω >> BB(BB(BB(10⁶))) >> Rayo(Rayo(10¹⁰⁰)) >> TREE(3) >> g₆₄'
+    }
+];
+
+// ==================== ГЕНЕРАЦИЯ КАРТОЧЕК ====================
+
+const levelsContainer = document.getElementById('levels');
+
+LEVELS.forEach(level => {
+    const card = document.createElement('div');
+    card.className = `level-card ${level.badge}`;
+    card.onclick = () => openModal(level.id);
+    card.innerHTML = `
+        <span class="badge ${level.badge}">${level.badgeText}</span>
+        <h3>${level.name}</h3>
+        <div class="formula-preview">${level.preview}</div>
+        <div class="desc">${level.desc}</div>
+    `;
+    levelsContainer.appendChild(card);
+});
+
+// ==================== МОДАЛЬНОЕ ОКНО ====================
+
+function openModal(id) {
+    const level = LEVELS.find(l => l.id === id);
+    if (!level) return;
+
+    const body = document.getElementById('modal-body');
+    body.innerHTML = `
+        <h2>${level.name}</h2>
+        <span class="badge ${level.badge}">${level.badgeText}</span>
+        <div class="modal-formula">${level.formula.replace(/\\n/g, '<br>')}</div>
+        <h3>ОБЪЯСНЕНИЕ</h3>
+        <p>${level.solution}</p>
+        <h3>ОТВЕТ</h3>
+        <div class="answer-box">${level.answer}</div>
+    `;
+
+    document.getElementById('modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Закрытие по клику вне окна
+document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target.id === 'modal') closeModal();
+});
+
+// Закрытие по Esc
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
+
+// ==================== КОНСОЛЬ ====================
+
+console.log('%c🦗 CICADA ULTIMATE', 'font-size: 24px; color: #00ff41; text-shadow: 0 0 10px #00ff41;');
+console.log('%cГугология. Уровни. Решения.', 'font-size: 14px; color: #00ff41;');
+console.log('%cTHE ANSWER IS NOT 0.12', 'font-size: 12px; color: #ff0041;');
+</script>
+</body>
+</html>
